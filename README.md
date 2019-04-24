@@ -1,44 +1,77 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Moderne React
 
-## Available Scripts
+Viser noen måter å bruke nye features i React. Brukt under fagdag 25.04.2019.
 
-In the project directory, you can run:
+## Hooks
 
-### `npm start`
+> https://reactjs.org/docs/hooks-intro.html
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Enklere å komponere og dele logikk på tvers av komponenter uten å skape dype komponenttrær
+- Kan bruke bl.a. `state` og lifecycle-metoder i funksjonskomponenter
+- Hooks kan bare brukes i funksjonskomponenter. Erstatter på mange måter `class`-komponenenter, men begge er fullt og helt støttet!
+- Som konvensjon prefikser man hooks med `use` for å visuelt skille dem fra andre funksjoner
+- Kan komponeneres på lik linje med vanlige funksjoner:
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+```js
+function useLightBulb(initialState = false) {
+  const [state, setState] = useState(initialState);
+  const toggle = useCallback(() => setState(state => !state), []);
+  return [state, toggle];
+}
 
-### `npm test`
+function App() {
+  const [on, toggle] = useLightBulb(false);
+  return (
+    <>
+      Light is {on ? 'on' : 'off'}
+      <button onClick={toggle}>Toggle</button>
+    </>
+  );
+}
+```
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Context
 
-### `npm run build`
+> https://reactjs.org/docs/context.html
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Mulig å distribuerte data nedover i treet uten å eksplitt sende `props`.
+- Kan brukes for "global" data som autentisering, språk, themes, feature flags etc
+- Men også for "compounded components" med implisitt tilstand i mellom dem slik som RadioGroup/Radio.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## Error Boundaries
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+> https://reactjs.org/docs/error-boundaries.html#introducing-error-boundaries
 
-### `npm run eject`
+- Håndtere exceptions kastet under render av komponentens barn.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+  - _Ikke_ feil som oppstår i event handlere, async kode, server side rendering eller i boundarien selv.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- En komponent blir en Error Boundary ved å implementere `componentDidCatch` enten `getDerivedStateFromError()` (eller begge).
+- Kan brukes til å rendre "fallback UIs" når noe går galt
+- Feil propageres oppover og håndteres av nærmeste ErrorBoundary (som betyr at man kan ha flere).
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Consuming Context
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### 1. Higher-Order Component based on Render Prop
 
-## Learn More
+![](./docs/hoc.png)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 2. Render Prop
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+![](./docs/render-prop.png)
+
+### 3. Hooks
+
+![](./docs/hooks.png)
+
+## Portals
+
+- Rendre til en annen DOM-node fra samme React-tre.
+
+## React.lazy
+
+- Automatisk Code-splitting
+
+## React.PureComponent / React.memo
+
+- Shallow equality checks (optimering)
